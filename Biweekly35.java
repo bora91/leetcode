@@ -1,7 +1,9 @@
-import java.util.Arrays;
+import java.util.*;
+
 class Solution35 {
     public static void main(String[] args) {
-        System.out.println(new Solution35().maxSumRangeQuery(new int[] { 1, 2, 3, 4, 5 }, new int[][]{{1,3},{0,1}}));
+        System.out.println(
+                new Solution35().minSubarray(new int[] { 1, 2, 3, 4, 5 }, 3));
     }
 
     public int sumOddLengthSubarrays(int[] arr) {
@@ -43,5 +45,23 @@ class Solution35 {
             sum %= mod;
         }
         return (int) (sum % mod);
+    }
+
+    public int minSubarray(int[] nums, int p) {
+        int n = nums.length;
+        int need = 0, cur = 0, min = n;
+        for (int num : nums)
+            need = (need + num) % p;
+        if (need == 0)
+            return 0;
+        Map<Integer, Integer> map = new HashMap<>();
+        map.put(0, -1);
+        for (int i = 0; i < n; i++) {
+            cur = (cur + nums[i]) % p;
+            map.put(cur, i);
+            int want = (cur - need + p) % p;
+            min = Math.min(min, i - map.getOrDefault(want, -n));
+        }
+        return min >= n ? -1 : min;
     }
 }
