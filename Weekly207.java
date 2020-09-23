@@ -2,7 +2,7 @@ import java.util.*;
 
 public class Weekly207 {
     public static void main(String[] args) {
-        System.out.println(new Weekly207().maxProductPath(new int[][]{{1,-2,1},{1,-2,1},{3,-4,1}}));
+        System.out.println(new Weekly207().isPrintable(new int[][]{{1,1,1,1},{1,1,3,3},{1,1,3,4},{5,5,1,4}}));
     }
 
     public String reorderSpaces(String text) {
@@ -99,5 +99,56 @@ public class Weekly207 {
             dfs(grid, i + 1, j, curr * grid[i + 1][j]);
         if (j + 1 < grid[0].length)
             dfs(grid, i, j + 1, curr * grid[i][j + 1]);
+    }
+
+    int[][]postMin = new int[61][2];
+    int[][]postMax = new int[61][2];
+    public boolean isPrintable(int[][] targetGrid) {
+        for(int[]row : postMin)
+            Arrays.fill(row, 61);
+        for(int[]row : postMax)
+            Arrays.fill(row, 0);
+        HashSet<Integer>colors = new HashSet<>();
+        int n = targetGrid.length;
+        int m = targetGrid[0].length;
+        for(int i = 0; i < n; i++){
+            for(int j = 0; j < m; j++){
+                int color = targetGrid[i][j];
+                colors.add(color);
+                postMin[color][0] = Math.min(postMin[color][0], i);
+                postMin[color][1] = Math.min(postMin[color][1], j);
+                postMax[color][0] = Math.max(postMax[color][0], i);
+                postMax[color][1] = Math.max(postMax[color][1], j);
+            }
+        }
+        
+        
+        while(colors.size() > 0){
+            HashSet<Integer>temp = new HashSet<>();
+            for(int color : colors){
+                if(!isReact(targetGrid, color))
+                    temp.add(color);
+            }
+            if(colors.size() == temp.size())
+                return false;
+            colors = temp;
+        }
+        
+        return true;
+    }
+    boolean isReact(int[][]A, int c){
+        for(int i = postMin[c][0]; i <= postMax[c][0]; i++){
+            for(int j = postMin[c][1]; j <= postMax[c][1]; j++){
+                if(A[i][j] > 0 && A[i][j] != c)
+                    return false;
+            }
+        }
+        for(int i = postMin[c][0]; i <= postMax[c][0]; i++){
+            for(int j = postMin[c][1]; j <= postMax[c][1]; j++){
+                A[i][j] = 0;
+            }
+        }
+        
+        return true;
     }
 }
